@@ -50,7 +50,7 @@ MAC=$(ip a | grep "link/ether" | awk '{printf $2}')
 
 # Nombre de commandes executees grace a sudo
 
-Sudo=$(cat /var/log/auth.log | grep "sudo" | wc -l)
+Sudo=$(cat /var/log/auth.log | grep -a "COMMAND" | wc -l)
 wall "
 #Architecture: ${arch1} ${arch2} ${arch3}
 #CPU Physical: ${CPU}
