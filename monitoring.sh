@@ -1,14 +1,21 @@
 #!/bin/bash
 
+# Liste des Couleurs
+
+RED='\e[1;31m%s\e[0m'
+GREEN='\e[1;32m%s\e[0m'
+YELLOW='\e[1;33m%s\e[0m'
+BLUE='\e[1;34m%s\e[0m'
+MAGENTA='\e[1;35m%s\e[0m'
+CYAN='\e[1;36m%s\e[0m'
+
 # Systeme d'Exploitation / Kernel
 
-arch1=$(hostnamectl | grep "Operating System" | awk '{printf $3 $4 $>
-arch2=$(cat /proc/cpuinfo | grep "model name" | cut -d " " -f3-)
-arch3=$(arch)
+arch=$(uname -a)
 
 # Nombre de Processeurs Physiques et Virtuels
 
-CPU=$(cat /proc/cpuinfo | grep "processor" | wc -l)
+CPU=$(nproc)
 vCPU=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
 # Memoire Vive (RAM) disponible + taux d'utilisation en %
@@ -33,7 +40,7 @@ LastB=$(who -b | awk '{printf $3 " " $4}')
 
 # LVM actif ou non
 
-uLVM=$(lsblk | grep "lvm" | awk '{if ($1) {printf "yes";exit;} else >
+uLVM=$(lsblk | grep "lvm" | awk '{if ($1) {printf "yes";exit;} else {printf "no"}}')
 
 # Nombre de connections actives
 
@@ -51,18 +58,18 @@ MAC=$(ip a | grep "link/ether" | awk '{printf $2}')
 # Nombre de commandes executees grace a sudo
 
 Sudo=$(cat /var/log/auth.log | grep -a "COMMAND" | wc -l)
-wall "
-#Architecture: ${arch1} ${arch2} ${arch3}
-#CPU Physical: ${CPU}
-#vCPU: ${vCPU}
-#Memory Usage: ${MemA}/${MemT}MB (${MemP}%)
-#Disk Usage: ${DiskA}/${DiskT}Gb (${DiskP})
-#CPU load: ${uCPU}%
-#Last boot: ${LastB}
-#LVM use: ${uLVM}
-#Connection TCP: ${TCP} ESTABLISHED
-#User log: ${uLog}
-#Network: IP ${IPv4} MAC ${MAC}
-#Sudo: ${Sudo} cmd
-"
 
+wall "
+`printf "$GREEN" "#Architecture:"` `printf "$RED" ${arch}`
+`printf "$GREEN" "#CPU Physical:"` `printf "$RED" ${CPU}`
+`printf "$GREEN" "#vCPU:"` `printf "$RED" ${vCPU}`
+`printf "$GREEN" "#Memory Usage:"` `printf "$RED" ${MemA}/${MemT}MB " " "("${MemP}%")"`
+`printf "$GREEN" "#Disk Usage:"` `printf "$RED" ${DiskA}/${DiskT}Gb " " "("${DiskP}")"`
+`printf "$GREEN" "#CPU load:"` `printf "$RED" ${uCPU}%`
+`printf "$GREEN" "#Last boot:"` `printf "$RED" ${LastB}`
+`printf "$GREEN" "#LVM use:"` `printf "$RED" ${uLVM}`
+`printf "$GREEN" "#Connection TCP:"` `printf "$RED" ${TCP} " " ESTABLISHED`
+`printf "$GREEN" "#User log:"` `printf "$RED" ${uLog}`
+`printf "$GREEN" "#Network:"` `printf "$RED" IP " " ${IPv4}` `printf "$RED" MAC " " ${MAC}`
+`printf "$GREEN" "#Sudo:"` `printf "$RED" ${Sudo} cmd`
+"
